@@ -1,0 +1,22 @@
+{
+  "name": "refermii-server",
+  "version": "1.0.0",
+  "description": "ReferMii is a full-stack application that allows users to find, share, and manage referral codes from various brands and services. The application includes a Node.js/Express backend with MongoDB database and a React frontend.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "scrape": "node ./src/scripts/scrape-reddit.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "axios": "^1.8.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "mongoose": "^8.13.2"
+  }
+}
