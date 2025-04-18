@@ -3,6 +3,12 @@ require('dotenv').config();
 const axios = require('axios');
 const mongoose = require('mongoose');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const path = require('path');
+
+// Import the validateReferralData function from server.js
+// Use a relative path to import from the parent directory
+const serverPath = path.join(__dirname, '../server');
+const { validateReferralData } = require(serverPath);
 
 // Parse command line arguments
 const parseArgs = () => {
@@ -194,6 +200,13 @@ Only return valid JSON with no other text.
             extractedData.expirationDate = defaultExpiry.toISOString().split('T')[0];
         }
 
+        // Trim all string fields
+        Object.keys(extractedData).forEach(key => {
+            if (typeof extractedData[key] === 'string') {
+                extractedData[key] = extractedData[key].trim();
+            }
+        });
+
         return {
             ...extractedData,
             postDate: new Date(post.created_utc * 1000),
@@ -252,14 +265,15 @@ async function saveReferralToDb(referralData) {
     }
 
     try {
-        // Check if this referral already exists
-        const isDuplicate = await Referral.checkDuplicate(referralData.brand, referralData.code);
-        if (isDuplicate) {
-            console.log(`Skipping duplicate referral for ${referralData.brand}`);
+        // Validate the referral data using the same logic as the API
+        const validationErrors = await validateReferralData(referralData);
+
+        if (validationErrors.length > 0) {
+            console.log('Validation errors:', validationErrors);
             return false;
         }
 
-        // Create and save new referral using the original model schema
+        // Create and save new referral
         const referral = new Referral({
             brand: referralData.brand,
             code: referralData.code,
